@@ -10,8 +10,10 @@ class Boy:
         self.face_dir = 1
         self.image = load_image('animation_sheet.png')
         self.state_machine = Machine(
-            model=self, states=[{'name': 'IDLE', 'on_enter': '_enter_idle'}, {'name': 'SLEEP', 'on_enter': '_enter_sleep'}], initial='IDLE', auto_transitions=False,
-            transitions=[{'trigger': 'wake_up', 'source': 'SLEEP', 'dest': 'IDLE'},
+            model=self, states=['RUN', {'name': 'IDLE', 'on_enter': '_enter_idle'}, {'name': 'SLEEP', 'on_enter': '_enter_sleep'}], initial='IDLE', auto_transitions=False,
+            transitions=[{'trigger': 'start_running', 'source': 'IDLE', 'dest': 'RUN'},
+                         {'trigger': 'stop_running', 'source': 'RUN', 'dest': 'IDLE'},
+                         {'trigger': 'wake_up', 'source': 'SLEEP', 'dest': 'IDLE'},
                          {'trigger': 'fall_asleep', 'source': 'IDLE', 'dest': 'SLEEP'},
                          {'trigger': 'animate', 'source': 'IDLE', 'dest': None,
                           'after': '_animate_idle'}])
