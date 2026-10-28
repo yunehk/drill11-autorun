@@ -9,7 +9,7 @@ class Boy:
         self.face_dir = 1
         self.image = load_image('animation_sheet.png')
         self.state_machine = Machine(
-            model=self, states=[{'name': 'IDLE', 'on_enter': '_enter_idle'}, 'SLEEP'], initial='IDLE', auto_transitions=False,
+            model=self, states=[{'name': 'IDLE', 'on_enter': '_enter_idle'}, {'name': 'SLEEP', 'on_enter': '_enter_sleep'}], initial='IDLE', auto_transitions=False,
             transitions=[{'trigger': 'wake_up', 'source': 'SLEEP', 'dest': 'IDLE'},
                          {'trigger': 'fall_asleep', 'source': 'IDLE', 'dest': 'SLEEP'},
                          {'trigger': 'animate', 'source': 'IDLE', 'dest': None,
@@ -37,3 +37,6 @@ class Boy:
         if (self.state == 'SLEEP' and event.type == SDL_KEYDOWN
                 and event.key == SDLK_SPACE):
             self.wake_up()
+
+    def _enter_sleep(self):
+        self.frame = 0
