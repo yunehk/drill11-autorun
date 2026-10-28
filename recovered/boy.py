@@ -1,5 +1,5 @@
 from math import pi
-from pico2d import load_image, get_time, SDL_KEYDOWN, SDLK_SPACE
+from pico2d import load_image, get_time, SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE
 from transitions import Machine
 
 class Boy:
@@ -8,6 +8,8 @@ class Boy:
         self.idle_started_at = get_time()
         self.frame = 0
         self.face_dir = 1
+        self.direction = 0
+        self.pressed_keys = []
         self.image = load_image('animation_sheet.png')
         self.state_machine = Machine(
             model=self, states=['RUN', {'name': 'IDLE', 'on_enter': '_enter_idle'}, {'name': 'SLEEP', 'on_enter': '_enter_sleep'}], initial='IDLE', auto_transitions=False,
@@ -42,9 +44,21 @@ class Boy:
         self.frame = 0
 
     def handle_event(self, event):
+        if self.state != 'SLEEP':
+            self._handle_direction(event)
         if (self.state == 'SLEEP' and event.type == SDL_KEYDOWN
                 and event.key == SDLK_SPACE):
             self.wake_up()
 
     def _enter_sleep(self):
         self.frame = 0
+
+    def _handle_direction(self, event):
+        if event.type != SDL_KEYDOWN or event.key not in (SDLK_LEFT, SDLK_RIGHT):
+            return
+        if event.key not in self.pressed_keys:
+            self.pressed_keys.append(event.key)
+        self.direction = 1 if self.pressed_keys[-1] == SDLK_RIGHT else -1
+        self.face_dir = self.direction
+        if self.state == 'IDLE':
+            self.start_running()
