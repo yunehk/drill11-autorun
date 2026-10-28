@@ -4,6 +4,7 @@ from transitions import Machine
 class Boy:
     def __init__(self):
         self.x, self.y = 400, 90
+        self.idle_started_at = get_time()
         self.frame = 0
         self.face_dir = 1
         self.image = load_image('animation_sheet.png')
@@ -14,7 +15,11 @@ class Boy:
                           'after': '_animate_idle'}])
 
     def update(self):
-        self.animate()
+        if self.state == 'IDLE':
+            if get_time() - self.idle_started_at >= 5.0:
+                self.fall_asleep()
+            else:
+                self.animate()
 
     def _animate_idle(self):
         self.frame = (self.frame + 1) % 8
