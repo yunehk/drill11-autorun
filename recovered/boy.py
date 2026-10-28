@@ -1,5 +1,5 @@
 from math import pi
-from pico2d import load_image, get_time, SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE
+from pico2d import load_image, get_time, get_canvas_width, SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE
 from transitions import Machine
 
 class Boy:
@@ -34,6 +34,8 @@ class Boy:
         elif self.state == 'RUN':
             self.x += self.direction * 200.0 * elapsed
             self._animate_idle()
+
+        self.x = max(50, min(get_canvas_width() - 50, self.x))
 
     def _animate_idle(self):
         self.frame = (self.frame + 1) % 8
