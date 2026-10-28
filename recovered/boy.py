@@ -5,7 +5,8 @@ from transitions import Machine
 class Boy:
     def __init__(self):
         self.x, self.y = 400, 90
-        self.idle_started_at = get_time()
+        self.last_updated_at = get_time()
+        self.idle_started_at = self.last_updated_at
         self.frame = 0
         self.face_dir = 1
         self.direction = 0
@@ -21,17 +22,27 @@ class Boy:
                           'after': '_animate_idle'}])
 
     def update(self):
+        now = get_time()
+        elapsed = max(0.0, now - self.last_updated_at)
+        self.last_updated_at = now
         if self.state == 'IDLE':
             if get_time() - self.idle_started_at >= 5.0:
                 self.fall_asleep()
             else:
                 self.animate()
 
+        elif self.state == 'RUN':
+            self.x += self.direction * 200.0 * elapsed
+            self._animate_idle()
+
     def _animate_idle(self):
         self.frame = (self.frame + 1) % 8
 
     def draw(self):
-        row = 300 if self.face_dir == 1 else 200
+        if self.state == 'RUN':
+            row = 100 if self.face_dir == 1 else 0
+        else:
+            row = 300 if self.face_dir == 1 else 200
         if self.state == 'SLEEP':
             angle = pi / 2 if self.face_dir == 1 else -pi / 2
             self.image.clip_composite_draw(0, row, 100, 100, angle, '',
