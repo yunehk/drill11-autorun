@@ -1,3 +1,4 @@
+from math import pi
 from pico2d import load_image, get_time, SDL_KEYDOWN, SDLK_SPACE
 from transitions import Machine
 
@@ -27,7 +28,12 @@ class Boy:
 
     def draw(self):
         row = 300 if self.face_dir == 1 else 200
-        self.image.clip_draw(self.frame * 100, row, 100, 100, self.x, self.y)
+        if self.state == 'SLEEP':
+            angle = pi / 2 if self.face_dir == 1 else -pi / 2
+            self.image.clip_composite_draw(0, row, 100, 100, angle, '',
+                                           self.x, self.y - 15, 100, 100)
+        else:
+            self.image.clip_draw(self.frame * 100, row, 100, 100, self.x, self.y)
 
     def _enter_idle(self):
         self.idle_started_at = get_time()
