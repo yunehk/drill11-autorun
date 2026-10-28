@@ -54,6 +54,16 @@ class Boy:
         self.frame = 0
 
     def _handle_direction(self, event):
+        if event.type == SDL_KEYUP and event.key in self.pressed_keys:
+            self.pressed_keys.remove(event.key)
+            if not self.pressed_keys:
+                self.direction = 0
+                if self.state == 'RUN':
+                    self.stop_running()
+            else:
+                self.direction = 1 if self.pressed_keys[-1] == SDLK_RIGHT else -1
+                self.face_dir = self.direction
+            return
         if event.type != SDL_KEYDOWN or event.key not in (SDLK_LEFT, SDLK_RIGHT):
             return
         if event.key not in self.pressed_keys:
