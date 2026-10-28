@@ -9,8 +9,9 @@ class Boy:
         self.face_dir = 1
         self.image = load_image('animation_sheet.png')
         self.state_machine = Machine(
-            model=self, states=['IDLE', 'SLEEP'], initial='IDLE', auto_transitions=False,
-            transitions=[{'trigger': 'fall_asleep', 'source': 'IDLE', 'dest': 'SLEEP'},
+            model=self, states=[{'name': 'IDLE', 'on_enter': '_enter_idle'}, 'SLEEP'], initial='IDLE', auto_transitions=False,
+            transitions=[{'trigger': 'wake_up', 'source': 'SLEEP', 'dest': 'IDLE'},
+                         {'trigger': 'fall_asleep', 'source': 'IDLE', 'dest': 'SLEEP'},
                          {'trigger': 'animate', 'source': 'IDLE', 'dest': None,
                           'after': '_animate_idle'}])
 
@@ -27,3 +28,12 @@ class Boy:
     def draw(self):
         row = 300 if self.face_dir == 1 else 200
         self.image.clip_draw(self.frame * 100, row, 100, 100, self.x, self.y)
+
+    def _enter_idle(self):
+        self.idle_started_at = get_time()
+        self.frame = 0
+
+    def handle_event(self, event):
+        if (self.state == 'SLEEP' and event.type == SDL_KEYDOWN
+                and event.key == SDLK_SPACE):
+            self.wake_up()
